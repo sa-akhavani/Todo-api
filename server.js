@@ -16,16 +16,23 @@ app.get('/', function (req, res) {
 });
 
 
-//GET /todos?completed=true
+//GET /todos?completed=true&q
 app.get('/todos', function(req, res) {
 	var queryParams = req.query;
 	var filteredTodos = todos;
 
 
-	if (queryParams && queryParams.completed === 'true') {
+	if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'true') {
 		var filteredTodos = _.where(todos, {completed: true})
-	} else 	if (queryParams && queryParams.completed === 'false') {
+	} else 	if (queryParams.hasOwnProperty('completed') && queryParams.completed === 'false') {
 		var filteredTodos = _.where(todos, {completed: false})
+	}
+
+	if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0 ) {
+		filteredTodos = _.filter(filteredTodos, function(todo) {
+			if (todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) != -1)
+				return todo;
+		});
 	}
 
 	res.json(filteredTodos);
